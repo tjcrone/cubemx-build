@@ -4,7 +4,7 @@
         {
             "name": "Cortex Debug",
             "cwd": "${workspaceRoot}",
-            "executable": "./cubemx-build/build/cubemx-build.elf",
+            "executable": "./build/cubemx-build.elf",
             "request": "launch",
             "type": "cortex-debug",
             "servertype": "jlink",

@@ -1,4 +1,4 @@
 *.swp
 .mxproject
 deadbeef.h
-cubemx-build/build/
+/build/*
