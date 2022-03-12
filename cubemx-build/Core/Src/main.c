@@ -26,6 +26,9 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include "string.h"
+#include "deadbeef.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -45,6 +48,17 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+
+FRESULT fres;
+FATFS fs = { 0 };
+FATFS *pfs;
+UINT byteswritten;
+UINT bytesread;
+BYTE work[4096];
+FIL fil;
+DWORD fre_clust;
+uint32_t total, totalfree;
+static const uint8_t deadbeef[][16] = DEADBEEF;
 
 /* USER CODE END PV */
 
@@ -91,6 +105,11 @@ int main(void)
   MX_DMA_Init();
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
+
+
+  fres = f_open(&fil, "test.txt", FA_CREATE_ALWAYS | FA_WRITE);
+  //fres = f_write(&fil, &asdf, 16 * 1, &byteswritten);
+  fres = f_write(&fil, &deadbeef, 8 * 1, &byteswritten);
 
   /* USER CODE END 2 */
 
@@ -183,8 +202,6 @@ void Error_Handler(void)
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
