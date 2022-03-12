@@ -58,7 +58,8 @@ BYTE work[4096];
 FIL fil;
 DWORD fre_clust;
 uint32_t total, totalfree;
-static const uint8_t deadbeef[][16] = DEADBEEF;
+
+static const char deadbeef[][16] = DEADBEEF;
 
 /* USER CODE END PV */
 
@@ -107,9 +108,9 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
 
-  fres = f_open(&fil, "test.txt", FA_CREATE_ALWAYS | FA_WRITE);
+  //fres = f_open(&fil, "test.txt", FA_CREATE_ALWAYS | FA_WRITE);
   //fres = f_write(&fil, &asdf, 16 * 1, &byteswritten);
-  fres = f_write(&fil, &deadbeef, 8 * 1, &byteswritten);
+  //fres = f_write(&fil, &deadbeef, 8 * 1, &byteswritten);
 
   /* USER CODE END 2 */
 
@@ -117,6 +118,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_5);
+    HAL_Delay(200);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
