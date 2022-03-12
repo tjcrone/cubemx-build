@@ -1,4 +1,4 @@
 *.swp
 .mxproject
-deadbeef.h
+deadbeef*
 /build/*
