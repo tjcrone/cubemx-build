@@ -105,10 +105,101 @@ int main(void)
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
 
+    // power-on memory module
+    mem_pwr_off();
+    HAL_Delay(100);
+    mem_pwr_on();
 
-  //fres = f_open(&fil, "test.txt", FA_CREATE_ALWAYS | FA_WRITE);
-  //fres = f_write(&fil, &asdf, 16 * 1, &byteswritten);
-  //fres = f_write(&fil, &deadbeef, 8 * 1, &byteswritten);
+    //mount card
+    fres = f_mount(&fs, "", 1);
+    if (fres != FR_OK)
+        Error_Handler();
+
+    // check free space
+    fres = f_getfree("", &fre_clust, &pfs);
+    if (fres != FR_OK)
+        Error_Handler();
+    total = (uint32_t) ((pfs->n_fatent - 2) * pfs->csize * 0.5); // total volume size (kB)
+    totalfree = (uint32_t) (fre_clust * pfs->csize * 0.5); // free space on volume (kB)
+
+    // test card total/free
+    //uint32_t samsung_pro_32_total = 31256800;
+    //uint32_t samsung_pro_32_free = 31256608;
+    uint32_t lexar_512_total = 483313152;
+    uint32_t lexar_512_free = 483312384;
+
+    if (total != lexar_512_total)
+        Error_Handler();
+    if (totalfree != lexar_512_free)
+        Error_Handler();
+
+    /*
+    // format card
+    fres = f_mkfs("", FM_EXFAT, 0, work, sizeof work);
+    if (fres != FR_OK)
+        Error_Handler();
+
+    // fill 16-kB page with 16-byte string
+    for (uint32_t i = 0; i < 1024; i++)
+        strcpy(data[i], "0123456789abcde\n");
+
+    // write text to file
+    uint16_t total_size = 10; // size of file in MB
+
+    // open file to write
+    fres = f_open(&fil, "test.txt", FA_CREATE_ALWAYS | FA_WRITE);
+    if (fres != FR_OK)
+        Error_Handler();
+
+    // write data to file
+    for (uint32_t i = 0; i < total_size * 1024 / 16; i++) {
+        fres = f_write(&fil, &data, 16 * 1024, &byteswritten);
+        if (fres != FR_OK)
+            Error_Handler();
+
+        // fres = f_sync(&fil);
+        // if (fres != FR_OK)
+        // error_loop();
+        //if (byteswritten != 16 * 1024)
+        //    Error_Handler();
+    }
+
+    // close file
+    fres = f_close(&fil);
+    if (fres != FR_OK)
+        Error_Handler();
+
+    // check file data
+    fres = f_open(&fil, "test.txt", FA_READ);
+    if (fres != FR_OK)
+        Error_Handler();
+
+    char data_read[17] = { 0 };
+    char data_check[17] = "0123456789abcde\n\0";
+
+    for (uint32_t i = 0; i < total_size * 1024 * 1024 / 16; i++) {
+        fres = f_read(&fil, data_read, 16, &bytesread);
+        if (fres != FR_OK)
+            Error_Handler();
+
+        if (strcmp(data_read, data_check) != 0)
+            Error_Handler();
+    }
+
+    // close file
+    fres = f_close(&fil);
+    if (fres != FR_OK)
+        Error_Handler();
+
+    //success flash
+    mem_led_flash(5, 40, 40);
+    HAL_Delay(1000);
+
+    // power-on memory module
+    mem_pwr_off();
+    HAL_SD_MspDeInit(&hsd1);
+
+*/
 
   /* USER CODE END 2 */
 
@@ -116,6 +207,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+
     HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_5);
     HAL_Delay(200);
 
