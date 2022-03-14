@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Cortex Debug",
+            "name": "Debug",
             "cwd": "${workspaceRoot}",
             "executable": "./build/cubemx-build.elf",
             "request": "launch",
@@ -10,7 +10,7 @@
             "servertype": "jlink",
             "device": "STM32L496RE",
             "interface": "swd",
-            "jlinkscript": null,
+            "jlinkscript": "",
             "svdFile": "./STM32L496.svd",
             "rttConfig": {
                 "enabled": true,
