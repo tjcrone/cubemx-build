@@ -70,7 +70,12 @@ Middlewares/Third_Party/FatFs/src/ff_gen_drv.c \
 Middlewares/Third_Party/FatFs/src/option/syscall.c \
 Middlewares/Third_Party/FatFs/src/option/ccsbcs.c \
 Core/Src/gpio.c \
-Core/Src/sdmmc.c
+Core/Src/sdmmc.c \
+Core/Src/SEGGER_RTT.c \
+Core/Src/SEGGER_RTT_Syscalls_GCC.c \
+Core/Src/SEGGER_RTT_printf.c
+
+#Core/Src/SEGGER_RTT_ASM_ARMv7M.S \
 
 # ASM sources
 ASM_SOURCES =  \

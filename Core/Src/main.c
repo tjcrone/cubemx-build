@@ -27,6 +27,7 @@
 
 #include "string.h"
 #include "deadbeef.h"
+#include "SEGGER_RTT.h"
 
 /* USER CODE END Includes */
 
@@ -110,31 +111,44 @@ int main(void)
   HAL_Delay(50);
   }
 
+  uint32_t  start;
+  uint32_t  stop;
 
     /*
     // power-on memory module
     mem_pwr_off();
     HAL_Delay(100);
     mem_pwr_on();
-
     */
 
     // format card
-    // fres = f_mkfs("", FM_EXFAT, 0, work, sizeof work);
-    //if (fres != FR_OK)
-    //    Error_Handler();
-
-    //mount card
-    fres = f_mount(&fs, "", 1);
+    start = uwTick;
+    fres = f_mkfs("", FM_EXFAT, 0, work, sizeof work);
+    stop = uwTick;
+    uint32_t  format_time = stop - start;
     if (fres != FR_OK)
         Error_Handler();
+    SEGGER_RTT_printf(0, "format time: %u\n", format_time);
+
+    //mount card
+    start = uwTick;
+    fres = f_mount(&fs, "", 1);
+    stop = uwTick;
+    uint32_t  mount_time = stop - start;
+    if (fres != FR_OK)
+        Error_Handler();
+    SEGGER_RTT_printf(0, "mount time: %u\n", mount_time);
 
     // check free space
     DWORD fre_clust;
     FATFS *pfs;
+    start = uwTick;
     fres = f_getfree("", &fre_clust, &pfs);
+    stop = uwTick;
+    uint32_t  check_time = stop - start;
     if (fres != FR_OK)
         Error_Handler();
+    SEGGER_RTT_printf(0, "check free time: %u\n", check_time);
 
     uint32_t total = (uint32_t) ( ((pfs->n_fatent)-2) * ((pfs->csize)/2) ) ;// * 1024; // total volume size in bytes
     uint32_t totalfree = (uint32_t) ( (fre_clust) * ((pfs->csize)/2) ) ;// * 1024; // total volume size in bytes
@@ -142,6 +156,8 @@ int main(void)
     //totalfree = (uint32_t) ((fre_clust) * (pfs->csize)/2) * 1024; // free space on volume in bytes
     //total = (uint32_t) ((pfs->n_fatent - 2) * pfs->csize * 0.5); // total volume size (kB)
     //totalfree = (uint32_t) (fre_clust * pfs->csize * 0.5); // free space on volume (kB)
+
+
 
     HAL_Delay(1000);
     // test card total/free
