@@ -64,10 +64,30 @@ static const char deadbeef[][16] = DEADBEEF;
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
+void flash(uint32_t);
+void loop_delay (uint32_t);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+void loop_delay (uint32_t loops) {
+    for (uint32_t i = 0; i < loops; i++) {
+        for (uint32_t j = 0; j < SystemCoreClock/20000; j++) {}
+    }
+}
+
+void flash(uint32_t n) {
+  for (uint8_t i = 0; i<n; i++) {
+      // HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_5);
+      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET);
+      HAL_Delay(50);
+      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET);
+      HAL_Delay(50);
+  }
+  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET);
+}
 
 /* USER CODE END 0 */
 
@@ -88,8 +108,6 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 
-  HAL_Delay(1000);
-
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -105,11 +123,7 @@ int main(void)
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
 
-  // toggle mcu led
-  for (uint8_t i = 0; i<10; i++) {
-  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_5);
-  HAL_Delay(50);
-  }
+  flash(10);
 
   uint32_t  start;
   uint32_t  stop;
@@ -121,7 +135,7 @@ int main(void)
     mem_pwr_on();
     */
 
-    // format card
+    /* format card
     SEGGER_RTT_printf(0, "formating card\n");
     start = uwTick;
     fres = f_mkfs("", FM_EXFAT, 0, work, sizeof work);
@@ -130,6 +144,7 @@ int main(void)
     if (fres != FR_OK)
         Error_Handler();
     SEGGER_RTT_printf(0, "format time: %u\n", format_time);
+    */
 
     //mount card
     start = uwTick;
@@ -151,14 +166,9 @@ int main(void)
         Error_Handler();
     SEGGER_RTT_printf(0, "check free time: %u\n", check_time);
 
-    uint32_t total = (uint32_t) ( ((pfs->n_fatent)-2) * ((pfs->csize)/2) ) ;// * 1024; // total volume size in bytes
-    uint32_t totalfree = (uint32_t) ( (fre_clust) * ((pfs->csize)/2) ) ;// * 1024; // total volume size in bytes
-    //total = (uint32_t) (((pfs->n_fatent)-2) * (pfs->csize)/2) * 1024; // total volume size in bytes
-    //totalfree = (uint32_t) ((fre_clust) * (pfs->csize)/2) * 1024; // free space on volume in bytes
-    //total = (uint32_t) ((pfs->n_fatent - 2) * pfs->csize * 0.5); // total volume size (kB)
-    //totalfree = (uint32_t) (fre_clust * pfs->csize * 0.5); // free space on volume (kB)
-
-
+    // calclulate
+    uint32_t volume_total = (uint32_t) ( ((pfs->n_fatent)-2) * ((pfs->csize)) ) * 512; // total volume size in bytes
+    uint32_t volumb_free = (uint32_t) ( (fre_clust) * ((pfs->csize)) ) * 512; // total volume size in bytes
 
     HAL_Delay(1000);
     // test card total/free
@@ -174,10 +184,6 @@ int main(void)
     //    Error_Handler();
 
     /*
-    // format card
-    fres = f_mkfs("", FM_EXFAT, 0, work, sizeof work);
-    if (fres != FR_OK)
-        Error_Handler();
 
     // fill 16-kB page with 16-byte string
     for (uint32_t i = 0; i < 1024; i++)
@@ -186,6 +192,7 @@ int main(void)
     // write text to file
     uint16_t total_size = 10; // size of file in MB
 
+    // delete test file
     // open file to write
     fres = f_open(&fil, "test.txt", FA_CREATE_ALWAYS | FA_WRITE);
     if (fres != FR_OK)
@@ -293,7 +300,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 1;
-  RCC_OscInitStruct.PLL.PLLN = 20;
+  RCC_OscInitStruct.PLL.PLLN = 10;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV8;
   RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
@@ -311,7 +318,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
     Error_Handler();
   }
