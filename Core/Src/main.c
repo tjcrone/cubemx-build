@@ -50,13 +50,10 @@
 
 FRESULT fres;
 FATFS fs = { 0 };
-FATFS *pfs;
 UINT byteswritten;
 UINT bytesread;
 BYTE work[4096];
 FIL fil;
-DWORD fre_clust;
-uint32_t total, totalfree;
 
 static const char deadbeef[][16] = DEADBEEF;
 
@@ -90,6 +87,8 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 
+  HAL_Delay(1000);
+
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -105,10 +104,25 @@ int main(void)
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
 
+  // toggle mcu led
+  for (uint8_t i = 0; i<10; i++) {
+  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_5);
+  HAL_Delay(50);
+  }
+
+
+    /*
     // power-on memory module
     mem_pwr_off();
     HAL_Delay(100);
     mem_pwr_on();
+
+    */
+
+    // format card
+    // fres = f_mkfs("", FM_EXFAT, 0, work, sizeof work);
+    //if (fres != FR_OK)
+    //    Error_Handler();
 
     //mount card
     fres = f_mount(&fs, "", 1);
@@ -116,22 +130,31 @@ int main(void)
         Error_Handler();
 
     // check free space
+    DWORD fre_clust;
+    FATFS *pfs;
     fres = f_getfree("", &fre_clust, &pfs);
     if (fres != FR_OK)
         Error_Handler();
-    total = (uint32_t) ((pfs->n_fatent - 2) * pfs->csize * 0.5); // total volume size (kB)
-    totalfree = (uint32_t) (fre_clust * pfs->csize * 0.5); // free space on volume (kB)
 
+    uint32_t total = (uint32_t) ( ((pfs->n_fatent)-2) * ((pfs->csize)/2) ) ;// * 1024; // total volume size in bytes
+    uint32_t totalfree = (uint32_t) ( (fre_clust) * ((pfs->csize)/2) ) ;// * 1024; // total volume size in bytes
+    //total = (uint32_t) (((pfs->n_fatent)-2) * (pfs->csize)/2) * 1024; // total volume size in bytes
+    //totalfree = (uint32_t) ((fre_clust) * (pfs->csize)/2) * 1024; // free space on volume in bytes
+    //total = (uint32_t) ((pfs->n_fatent - 2) * pfs->csize * 0.5); // total volume size (kB)
+    //totalfree = (uint32_t) (fre_clust * pfs->csize * 0.5); // free space on volume (kB)
+
+    HAL_Delay(1000);
     // test card total/free
+    //uint32_t total_test = 
     //uint32_t samsung_pro_32_total = 31256800;
     //uint32_t samsung_pro_32_free = 31256608;
-    uint32_t lexar_512_total = 483313152;
-    uint32_t lexar_512_free = 483312384;
+    //uint32_t lexar_512_total = 483313152;
+    //uint32_t lexar_512_free = 483312384;
 
-    if (total != lexar_512_total)
-        Error_Handler();
-    if (totalfree != lexar_512_free)
-        Error_Handler();
+    //if (total != total_test)
+    //    Error_Handler();
+    //if (totalfree != lexar_512_free)
+    //    Error_Handler();
 
     /*
     // format card
@@ -208,8 +231,19 @@ int main(void)
   while (1)
   {
 
+    // toggle mcu led
     HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_5);
     HAL_Delay(200);
+
+    /* toggle mem pwr
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET);
+    HAL_Delay(3000);
+
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET);
+    HAL_Delay(3000);
+    */
 
     /* USER CODE END WHILE */
 
