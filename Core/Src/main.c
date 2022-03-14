@@ -122,6 +122,7 @@ int main(void)
     */
 
     // format card
+    SEGGER_RTT_printf(0, "formating card\n");
     start = uwTick;
     fres = f_mkfs("", FM_EXFAT, 0, work, sizeof work);
     stop = uwTick;
