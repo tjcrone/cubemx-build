@@ -85,6 +85,9 @@ void HardFault_Handler(void)
 {
   /* USER CODE BEGIN HardFault_IRQn 0 */
 
+  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET);
+  uint8_t e = 0;
+
   /* USER CODE END HardFault_IRQn 0 */
   while (1)
   {
