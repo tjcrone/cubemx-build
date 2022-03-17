@@ -74,7 +74,7 @@ void loop_delay (uint32_t);
 
 void loop_delay (uint32_t loops) {
     for (uint32_t i = 0; i < loops; i++) {
-        for (uint32_t j = 0; j < SystemCoreClock/20000; j++) {}
+        for (uint32_t j = 0; j < SystemCoreClock/18020; j++) {}
     }
 }
 
@@ -104,7 +104,10 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  //SEGGER_RTT_printf(0, "HAL_Init() start\n");
   HAL_Init();
+  //SEGGER_RTT_printf(0, "HAL_Init() done\n");
+  //loop_delay(1000);
 
   /* USER CODE BEGIN Init */
 
@@ -112,18 +115,34 @@ int main(void)
 
   /* Configure the system clock */
   SystemClock_Config();
+  //SEGGER_RTT_printf(0, "SystemClock_Config() done\n");
+  //loop_delay(1000);
+  //loop_delay(1000);
 
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
+  //loop_delay(1000);
   MX_GPIO_Init();
+  //SEGGER_RTT_printf(0, "MX_GPIO_Init() done\n");
+  //loop_delay(1000);
+  //flash(10);
+  //loop_delay(1000);
   MX_SDMMC1_SD_Init();
+  //SEGGER_RTT_printf(0, "MX_SDMMC1_SD_Init() done\n");
+  //loop_delay(1000);
+  //flash(20);
+  //loop_delay(1000);
   MX_FATFS_Init();
+  //SEGGER_RTT_printf(0, "MX_FATFS_Init() done\n");
+  //loop_delay(1000);
+  //flash(30);
+  //loop_delay(1000);
   /* USER CODE BEGIN 2 */
 
-  flash(10);
+  //flash(10);
 
   uint32_t  start;
   uint32_t  stop;
@@ -146,6 +165,14 @@ int main(void)
     SEGGER_RTT_printf(0, "format time: %u\n", format_time);
     */
 
+    // test loop_delay
+    start = uwTick;
+    loop_delay(1000);
+    stop = uwTick;
+    uint32_t  loop_time = stop - start;
+
+   /*
+
     //mount card
     start = uwTick;
     fres = f_mount(&fs, "", 1);
@@ -166,33 +193,37 @@ int main(void)
         Error_Handler();
     SEGGER_RTT_printf(0, "check free time: %u\n", check_time);
 
-    // calclulate
-    uint32_t volume_total = (uint32_t) ( ((pfs->n_fatent)-2) * ((pfs->csize)) ) * 512; // total volume size in bytes
-    uint32_t volumb_free = (uint32_t) ( (fre_clust) * ((pfs->csize)) ) * 512; // total volume size in bytes
+    // calclulate sizes
+    uint64_t volume_tot = ( (uint64_t) (pfs->n_fatent - 2) ) * pfs->csize * 512; // total volume size in bytes
+    uint64_t volume_fre = ( (uint64_t) (fre_clust) ) * pfs->csize * 512; // total volume size in bytes
 
-    HAL_Delay(1000);
-    // test card total/free
-    //uint32_t total_test = 
-    //uint32_t samsung_pro_32_total = 31256800;
-    //uint32_t samsung_pro_32_free = 31256608;
-    //uint32_t lexar_512_total = 483313152;
-    //uint32_t lexar_512_free = 483312384;
+    */
 
-    //if (total != total_test)
-    //    Error_Handler();
-    //if (totalfree != lexar_512_free)
-    //    Error_Handler();
+    loop_delay(1000);
 
     /*
+    // test card total/free
+    // samsung pro 32
+    if ( volume_tot != 32022691840 )
+        Error_Handler();
+    if ( volume_fre != 32022495232 )
+        Error_Handler();
+    */
+    /* lexar 512
+    if ( volume_tot != 32022691840 )
+        Error_Handler();
+    if ( volume_fre != 32022495232 )
+        Error_Handler();
+    */
 
-    // fill 16-kB page with 16-byte string
-    for (uint32_t i = 0; i < 1024; i++)
-        strcpy(data[i], "0123456789abcde\n");
+    flash(10);
+
+   /*
+   
 
     // write text to file
     uint16_t total_size = 10; // size of file in MB
 
-    // delete test file
     // open file to write
     fres = f_open(&fil, "test.txt", FA_CREATE_ALWAYS | FA_WRITE);
     if (fres != FR_OK)
@@ -246,7 +277,7 @@ int main(void)
     mem_pwr_off();
     HAL_SD_MspDeInit(&hsd1);
 
-*/
+  */
 
   /* USER CODE END 2 */
 
@@ -339,6 +370,7 @@ void Error_Handler(void)
   __disable_irq();
   while (1)
   {
+
   }
   /* USER CODE END Error_Handler_Debug */
 }
