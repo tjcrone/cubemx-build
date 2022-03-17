@@ -25,10 +25,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-#include "string.h"
-#include "deadbeef.h"
-#include "SEGGER_RTT.h"
-
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -49,45 +45,16 @@
 
 /* USER CODE BEGIN PV */
 
-FRESULT fres;
-FATFS fs = { 0 };
-UINT byteswritten;
-UINT bytesread;
-BYTE work[4096];
-FIL fil;
-
-static const char deadbeef[][16] = DEADBEEF;
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
-void flash(uint32_t);
-void loop_delay (uint32_t);
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-void loop_delay (uint32_t loops) {
-    for (uint32_t i = 0; i < loops; i++) {
-        for (uint32_t j = 0; j < SystemCoreClock/18020; j++) {}
-    }
-}
-
-void flash(uint32_t n) {
-  for (uint8_t i = 0; i<n; i++) {
-      // HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_5);
-      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET);
-      HAL_Delay(50);
-      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET);
-      HAL_Delay(50);
-  }
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET);
-}
 
 /* USER CODE END 0 */
 
@@ -104,10 +71,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  //SEGGER_RTT_printf(0, "HAL_Init() start\n");
   HAL_Init();
-  //SEGGER_RTT_printf(0, "HAL_Init() done\n");
-  //loop_delay(1000);
 
   /* USER CODE BEGIN Init */
 
@@ -115,169 +79,16 @@ int main(void)
 
   /* Configure the system clock */
   SystemClock_Config();
-  //SEGGER_RTT_printf(0, "SystemClock_Config() done\n");
-  //loop_delay(1000);
-  //loop_delay(1000);
 
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
-  //loop_delay(1000);
   MX_GPIO_Init();
-  //SEGGER_RTT_printf(0, "MX_GPIO_Init() done\n");
-  //loop_delay(1000);
-  //flash(10);
-  //loop_delay(1000);
   MX_SDMMC1_SD_Init();
-  //SEGGER_RTT_printf(0, "MX_SDMMC1_SD_Init() done\n");
-  //loop_delay(1000);
-  //flash(20);
-  //loop_delay(1000);
   MX_FATFS_Init();
-  //SEGGER_RTT_printf(0, "MX_FATFS_Init() done\n");
-  //loop_delay(1000);
-  //flash(30);
-  //loop_delay(1000);
   /* USER CODE BEGIN 2 */
-
-  //flash(10);
-
-  uint32_t  start;
-  uint32_t  stop;
-
-    /*
-    // power-on memory module
-    mem_pwr_off();
-    HAL_Delay(100);
-    mem_pwr_on();
-    */
-
-    /* format card
-    SEGGER_RTT_printf(0, "formating card\n");
-    start = uwTick;
-    fres = f_mkfs("", FM_EXFAT, 0, work, sizeof work);
-    stop = uwTick;
-    uint32_t  format_time = stop - start;
-    if (fres != FR_OK)
-        Error_Handler();
-    SEGGER_RTT_printf(0, "format time: %u\n", format_time);
-    */
-
-    // test loop_delay
-    start = uwTick;
-    loop_delay(1000);
-    stop = uwTick;
-    uint32_t  loop_time = stop - start;
-
-   /*
-
-    //mount card
-    start = uwTick;
-    fres = f_mount(&fs, "", 1);
-    stop = uwTick;
-    uint32_t  mount_time = stop - start;
-    if (fres != FR_OK)
-        Error_Handler();
-    SEGGER_RTT_printf(0, "mount time: %u\n", mount_time);
-
-    // check free space
-    DWORD fre_clust;
-    FATFS *pfs;
-    start = uwTick;
-    fres = f_getfree("", &fre_clust, &pfs);
-    stop = uwTick;
-    uint32_t  check_time = stop - start;
-    if (fres != FR_OK)
-        Error_Handler();
-    SEGGER_RTT_printf(0, "check free time: %u\n", check_time);
-
-    // calclulate sizes
-    uint64_t volume_tot = ( (uint64_t) (pfs->n_fatent - 2) ) * pfs->csize * 512; // total volume size in bytes
-    uint64_t volume_fre = ( (uint64_t) (fre_clust) ) * pfs->csize * 512; // total volume size in bytes
-
-    */
-
-    loop_delay(1000);
-
-    /*
-    // test card total/free
-    // samsung pro 32
-    if ( volume_tot != 32022691840 )
-        Error_Handler();
-    if ( volume_fre != 32022495232 )
-        Error_Handler();
-    */
-    /* lexar 512
-    if ( volume_tot != 32022691840 )
-        Error_Handler();
-    if ( volume_fre != 32022495232 )
-        Error_Handler();
-    */
-
-    flash(10);
-
-   /*
-   
-
-    // write text to file
-    uint16_t total_size = 10; // size of file in MB
-
-    // open file to write
-    fres = f_open(&fil, "test.txt", FA_CREATE_ALWAYS | FA_WRITE);
-    if (fres != FR_OK)
-        Error_Handler();
-
-    // write data to file
-    for (uint32_t i = 0; i < total_size * 1024 / 16; i++) {
-        fres = f_write(&fil, &data, 16 * 1024, &byteswritten);
-        if (fres != FR_OK)
-            Error_Handler();
-
-        // fres = f_sync(&fil);
-        // if (fres != FR_OK)
-        // error_loop();
-        //if (byteswritten != 16 * 1024)
-        //    Error_Handler();
-    }
-
-    // close file
-    fres = f_close(&fil);
-    if (fres != FR_OK)
-        Error_Handler();
-
-    // check file data
-    fres = f_open(&fil, "test.txt", FA_READ);
-    if (fres != FR_OK)
-        Error_Handler();
-
-    char data_read[17] = { 0 };
-    char data_check[17] = "0123456789abcde\n\0";
-
-    for (uint32_t i = 0; i < total_size * 1024 * 1024 / 16; i++) {
-        fres = f_read(&fil, data_read, 16, &bytesread);
-        if (fres != FR_OK)
-            Error_Handler();
-
-        if (strcmp(data_read, data_check) != 0)
-            Error_Handler();
-    }
-
-    // close file
-    fres = f_close(&fil);
-    if (fres != FR_OK)
-        Error_Handler();
-
-    //success flash
-    mem_led_flash(5, 40, 40);
-    HAL_Delay(1000);
-
-    // power-on memory module
-    mem_pwr_off();
-    HAL_SD_MspDeInit(&hsd1);
-
-  */
 
   /* USER CODE END 2 */
 
@@ -285,21 +96,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
-    // toggle mcu led
-    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_5);
-    HAL_Delay(200);
-
-    /* toggle mem pwr
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET);
-    HAL_Delay(3000);
-
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET);
-    HAL_Delay(3000);
-    */
-
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -370,7 +166,6 @@ void Error_Handler(void)
   __disable_irq();
   while (1)
   {
-
   }
   /* USER CODE END Error_Handler_Debug */
 }
@@ -386,6 +181,8 @@ void Error_Handler(void)
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
