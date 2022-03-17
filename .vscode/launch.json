@@ -11,18 +11,7 @@
             "device": "STM32L496RE",
             "interface": "swd",
             "jlinkscript": "",
-            "svdFile": "./STM32L496.svd",
-            "rttConfig": {
-                "enabled": true,
-                "address": "auto",
-                "decoders": [
-                    {
-                        "label": "",
-                        "port": 0,
-                        "type": "console"
-                    }
-                ]
-            }
+            "svdFile": "./STM32L496.svd"
         }
     ]
 }
