@@ -80,20 +80,15 @@ int main(void)
 
   /* Configure the system clock */
   SystemClock_Config();
-  loop_delay(1000);
 
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
-  loop_delay(1000);
   MX_GPIO_Init();
-  loop_delay(100);
   MX_SDMMC1_SD_Init();
-  loop_delay(100);
   MX_FATFS_Init();
-  loop_delay(100);
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
