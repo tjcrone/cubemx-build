@@ -4,7 +4,6 @@
 #define __ENDO_DEV_H__
 
 //includes
-#include "fatfs.h"
 #include "string.h"
 #include "deadbeef.h"
 

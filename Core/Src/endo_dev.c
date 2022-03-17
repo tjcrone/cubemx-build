@@ -1,15 +1,19 @@
 /* Development code for Endurologger */
 
 // includes
+#include "stdint.h"
+#include "gpio.h"
 #include "endo_dev.h"
 
 // global variables
+/*
 FRESULT fres;
 FATFS fs = { 0 };
 UINT byteswritten;
 UINT bytesread;
 BYTE work[4096];
 FIL fil;
+*/
 static const char deadbeef[][16] = DEADBEEF;
 
 // delay function without using HAL
