@@ -2,6 +2,13 @@
 
 // includes
 #include "endo_dev.h"
+#include "string.h"
+#include "gpio.h"
+#include "fatfs.h"
+#include "deadbeef.h"
+
+// static variables in bss
+static const char deadbeef[][16] = DEADBEEF;
 
 // global variables
 FRESULT fres;
@@ -10,7 +17,6 @@ UINT byteswritten;
 UINT bytesread;
 BYTE work[4096];
 FIL fil;
-static const char deadbeef[][16] = DEADBEEF;
 
 // delay function without using HAL
 void loop_delay (uint32_t loops) {
@@ -19,28 +25,33 @@ void loop_delay (uint32_t loops) {
     }
 }
 
-// basic LED flasher n-times
-void flash(uint32_t n, uint32_t delay) {
+void flash(uint32_t n, uint32_t on_time, uint32_t off_time) {
   for (uint8_t i = 0; i<n; i++) {
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET);
-    HAL_Delay(delay);
+    loop_delay(on_time);
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET);
-    HAL_Delay(delay);
+    loop_delay(off_time);
   }
 }
 
 // full test suite
 void sd_test(void) {
-    flash(1, 200);
+    flash(1, 200, 200);
     HAL_Delay(1000);
     sd_mount();
-    flash(8, 50);
+    flash(8, 50, 50);
     HAL_Delay(1000);
 
-    flash(2, 200);
+    flash(2, 200, 200);
     HAL_Delay(1000);
     sd_check_free();
-    flash(8, 50);
+    flash(8, 50, 50);
+    HAL_Delay(1000);
+
+    flash(3, 200, 200);
+    HAL_Delay(1000);
+    sd_test_write();
+    flash(8, 50, 50);
     HAL_Delay(1000);
 }
 
@@ -70,32 +81,27 @@ void sd_check_free(void) {
         Error_Handler();
 }
 
-
-
-// sd card test scratch
-    /*
-    // format card
-    start = uwTick;
-    fres = f_mkfs("", FM_EXFAT, 0, work, sizeof work);
-    stop = uwTick;
-    uint32_t  format_time = stop - start;
-    if (fres != FR_OK)
-        Error_Handler();
-
-
-    // write text to file
-    uint16_t total_size = 10; // size of file in MB
-
+// write test file
+void sd_test_write(void) {
     // open file to write
     fres = f_open(&fil, "test.txt", FA_CREATE_ALWAYS | FA_WRITE);
     if (fres != FR_OK)
         Error_Handler();
 
-    // write data to file
-    for (uint32_t i = 0; i < total_size * 1024 / 16; i++) {
-        fres = f_write(&fil, &data, 16 * 1024, &byteswritten);
-        if (fres != FR_OK)
-            Error_Handler();
+    // write deadbeef data to file
+    uint32_t datarows = ( (uint32_t) sizeof(deadbeef) ) / 16;
+    //for (uint32_t i = 0; i < datarows; i++) {
+    fres = f_write(&fil, &deadbeef, 16 * datarows, &byteswritten);
+    if (fres != FR_OK)
+        Error_Handler();
+
+    fres = f_sync(&fil);
+    fres = f_close(&fil);
+}
+
+/*
+    // write text to file
+    uint16_t total_size = 10; // size of file in MB
 
         // fres = f_sync(&fil);
         // if (fres != FR_OK)
@@ -108,6 +114,32 @@ void sd_check_free(void) {
     fres = f_close(&fil);
     if (fres != FR_OK)
         Error_Handler();
+*/
+
+
+// check test file
+
+
+
+// delete test file
+
+
+
+// format sd card
+
+
+
+
+// sd card test scratch
+    /*
+    // format card
+    start = uwTick;
+    fres = f_mkfs("", FM_EXFAT, 0, work, sizeof work);
+    stop = uwTick;
+    uint32_t  format_time = stop - start;
+    if (fres != FR_OK)
+        Error_Handler();
+
 
 
 

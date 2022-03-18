@@ -98,7 +98,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    flash(1, 100);
+    flash(1, 100, 100);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -168,8 +168,7 @@ void Error_Handler(void)
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
   while (1) {
-    flash(1, 1000);
-    HAL_Delay(20);
+    flash(1, 2000, 50);
   }
   /* USER CODE END Error_Handler_Debug */
 }
