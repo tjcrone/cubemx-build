@@ -32,17 +32,51 @@ void flash(uint32_t n, uint32_t delay) {
   }
 }
 
+// full test suite
+void sd_test(void) {
+    flash(1, 200);
+    HAL_Delay(1000);
+    sd_mount();
+    flash(8, 50);
+    HAL_Delay(1000);
+
+    flash(2, 200);
+    HAL_Delay(1000);
+    sd_check_free();
+    flash(8, 50);
+    HAL_Delay(1000);
+}
+
+// mount sd card
+void sd_mount(void) {
+    fres = f_mount(&fs, "", 1);
+    if (fres != FR_OK)
+        Error_Handler();
+}
+
+// check sd free space
+void sd_check_free(void) {
+    DWORD fre_clust;
+    FATFS *pfs;
+    fres = f_getfree("", &fre_clust, &pfs);
+    if (fres != FR_OK)
+        Error_Handler();
+
+    // calclulate sizes
+    uint64_t volume_tot = ( (uint64_t) (pfs->n_fatent - 2) ) * pfs->csize * 512; // total volume size in bytes
+    uint64_t volume_fre = ( (uint64_t) (fre_clust) ) * pfs->csize * 512; // total volume size in bytes
+
+    // samsung pro 32
+    if ( volume_tot != 32022691840 )
+        Error_Handler();
+    if ( volume_fre != 32022495232 )
+        Error_Handler();
+}
+
+
+
 // sd card test scratch
-
     /*
-    uint32_t  start;
-    uint32_t  stop;
-
-    // power-on memory module
-    mem_pwr_off();
-    HAL_Delay(100);
-    mem_pwr_on();
-
     // format card
     start = uwTick;
     fres = f_mkfs("", FM_EXFAT, 0, work, sizeof work);
@@ -51,44 +85,6 @@ void flash(uint32_t n, uint32_t delay) {
     if (fres != FR_OK)
         Error_Handler();
 
-    //mount card
-    start = uwTick;
-    fres = f_mount(&fs, "", 1);
-    stop = uwTick;
-    uint32_t  mount_time = stop - start;
-    if (fres != FR_OK)
-        Error_Handler();
-
-    // check free space
-    DWORD fre_clust;
-    FATFS *pfs;
-    start = uwTick;
-    fres = f_getfree("", &fre_clust, &pfs);
-    stop = uwTick;
-    uint32_t  check_time = stop - start;
-    if (fres != FR_OK)
-        Error_Handler();
-
-    // calclulate sizes
-    uint64_t volume_tot = ( (uint64_t) (pfs->n_fatent - 2) ) * pfs->csize * 512; // total volume size in bytes
-    uint64_t volume_fre = ( (uint64_t) (fre_clust) ) * pfs->csize * 512; // total volume size in bytes
-
-    loop_delay(1000);
-
-    // test card total/free
-    // samsung pro 32
-    if ( volume_tot != 32022691840 )
-        Error_Handler();
-    if ( volume_fre != 32022495232 )
-        Error_Handler();
-
-    // lexar 512
-    if ( volume_tot != 32022691840 )
-        Error_Handler();
-    if ( volume_fre != 32022495232 )
-        Error_Handler();
-
-    flash(10);
 
     // write text to file
     uint16_t total_size = 10; // size of file in MB
@@ -116,6 +112,8 @@ void flash(uint32_t n, uint32_t delay) {
     if (fres != FR_OK)
         Error_Handler();
 
+
+
     // check file data
     fres = f_open(&fil, "test.txt", FA_READ);
     if (fres != FR_OK)
@@ -137,13 +135,5 @@ void flash(uint32_t n, uint32_t delay) {
     fres = f_close(&fil);
     if (fres != FR_OK)
         Error_Handler();
-
-    //success flash
-    mem_led_flash(5, 40, 40);
-    HAL_Delay(1000);
-
-    // power-on memory module
-    mem_pwr_off();
-    HAL_SD_MspDeInit(&hsd1);
 
   */

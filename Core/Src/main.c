@@ -92,6 +92,7 @@ int main(void)
   MX_SDMMC1_SD_Init();
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
+  sd_test();
 
   /* USER CODE END 2 */
 
