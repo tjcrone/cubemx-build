@@ -3,17 +3,16 @@
 // includes
 #include "stdint.h"
 #include "gpio.h"
+#include "fatfs.h"
 #include "endo_dev.h"
 
 // global variables
-/*
 FRESULT fres;
 FATFS fs = { 0 };
 UINT byteswritten;
 UINT bytesread;
 BYTE work[4096];
 FIL fil;
-*/
 static const char deadbeef[][16] = DEADBEEF;
 
 // delay function without using HAL
@@ -52,12 +51,6 @@ void flash(uint32_t n, uint32_t delay) {
     if (fres != FR_OK)
         Error_Handler();
 
-    // test loop_delay
-    start = uwTick;
-    loop_delay(1000);
-    stop = uwTick;
-    uint32_t  loop_time = stop - start;
-
     //mount card
     start = uwTick;
     fres = f_mount(&fs, "", 1);
@@ -65,7 +58,6 @@ void flash(uint32_t n, uint32_t delay) {
     uint32_t  mount_time = stop - start;
     if (fres != FR_OK)
         Error_Handler();
-    SEGGER_RTT_printf(0, "mount time: %u\n", mount_time);
 
     // check free space
     DWORD fre_clust;
@@ -76,7 +68,6 @@ void flash(uint32_t n, uint32_t delay) {
     uint32_t  check_time = stop - start;
     if (fres != FR_OK)
         Error_Handler();
-    SEGGER_RTT_printf(0, "check free time: %u\n", check_time);
 
     // calclulate sizes
     uint64_t volume_tot = ( (uint64_t) (pfs->n_fatent - 2) ) * pfs->csize * 512; // total volume size in bytes
