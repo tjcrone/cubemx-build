@@ -1,9 +1,6 @@
 /* Development code for Endurologger */
 
 // includes
-#include "stdint.h"
-#include "gpio.h"
-#include "fatfs.h"
 #include "endo_dev.h"
 
 // global variables

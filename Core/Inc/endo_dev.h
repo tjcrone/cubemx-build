@@ -4,7 +4,10 @@
 #define __ENDO_DEV_H__
 
 //includes
+#include "stdint.h"
 #include "string.h"
+#include "gpio.h"
+#include "fatfs.h"
 #include "deadbeef.h"
 
 // function prototypes
